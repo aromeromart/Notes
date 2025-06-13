@@ -1,7 +1,7 @@
 # Notes
 
 ## Descripción
-Este es mi primer README y lo primero que me preocupa es el GIT.
+fichero que explica como voy desarrollando el proyecto Notes
 
 ## Configuración Inicial de Git
 
