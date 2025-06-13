@@ -10,6 +10,11 @@ git remote add origin https://github.com/aromeromart/Notes.git
 git push -u origin main
 
 
-ALIAS PARA NOTEPAD 
 
-Set-Alias np "C:\Program Files\Notepad++\notepad++.exe"
+
+g para abrir el repositorio Notes
+readme para abrir el readme con el NOTEPAD
+notes para ir al directorio notes 
+
+
+OBJETIVO 
