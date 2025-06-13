@@ -25,4 +25,7 @@ git push -u origin main
 
 ## Objetivo
 
-<!-- Completar con el objetivo del proyecto -->
+El objetivo del proyecto es crear una arquitectura para introducir notas y que estas sean revisadas por nuestro asistente
+
+
+
