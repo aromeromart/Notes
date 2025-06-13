@@ -1,0 +1,571 @@
+{
+  "name": "Telegram Bot - Message Type Router",
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "accessToken",
+        "accessToken": "={{$vars.TELEGRAM_BOT_TOKEN}}",
+        "updates": [
+          "message",
+          "edited_message",
+          "callback_query"
+        ],
+        "additionalFields": {
+          "download": true
+        }
+      },
+      "id": "1e4b2f3a-8c9d-4e5f-b6a7-1c2d3e4f5a6b",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "auto-generated"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Message Type Detector\nconst items = $input.all();\nconst output = [];\n\nfor (const item of items) {\n  const message = item.json.message || item.json.edited_message;\n  \n  if (!message) {\n    continue;\n  }\n  \n  let messageType = 'unknown';\n  \n  // Detectar tipo de mensaje\n  if (message.text) {\n    messageType = 'text';\n  } else if (message.photo) {\n    messageType = 'photo';\n  } else if (message.video) {\n    messageType = 'video';\n  } else if (message.voice) {\n    messageType = 'voice';\n  } else if (message.audio) {\n    messageType = 'audio';\n  } else if (message.document) {\n    messageType = 'document';\n  } else if (message.sticker) {\n    messageType = 'sticker';\n  } else if (message.animation) {\n    messageType = 'animation';\n  } else if (message.location) {\n    messageType = 'location';\n  } else if (message.contact) {\n    messageType = 'contact';\n  } else if (message.venue) {\n    messageType = 'venue';\n  } else if (message.poll) {\n    messageType = 'poll';\n  } else if (message.dice) {\n    messageType = 'dice';\n  } else if (message.game) {\n    messageType = 'game';\n  } else if (message.video_note) {\n    messageType = 'video_note';\n  }\n  \n  // Añadir el tipo al mensaje original\n  const result = {\n    ...item.json,\n    messageType: messageType\n  };\n  \n  output.push({ json: result });\n}\n\nreturn output;"
+      },
+      "id": "2f5c6d7e-9a1b-4c3d-8e9f-2d3e4f5a6b7c",
+      "name": "Message Type Detector",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "output": "specified",
+        "outputsCount": 16,
+        "rules": {
+          "rules": [
+            {
+              "output": 0,
+              "expression": "={{ $json.messageType === 'text' }}"
+            },
+            {
+              "output": 1,
+              "expression": "={{ $json.messageType === 'photo' }}"
+            },
+            {
+              "output": 2,
+              "expression": "={{ $json.messageType === 'video' }}"
+            },
+            {
+              "output": 3,
+              "expression": "={{ $json.messageType === 'voice' }}"
+            },
+            {
+              "output": 4,
+              "expression": "={{ $json.messageType === 'audio' }}"
+            },
+            {
+              "output": 5,
+              "expression": "={{ $json.messageType === 'document' }}"
+            },
+            {
+              "output": 6,
+              "expression": "={{ $json.messageType === 'sticker' }}"
+            },
+            {
+              "output": 7,
+              "expression": "={{ $json.messageType === 'animation' }}"
+            },
+            {
+              "output": 8,
+              "expression": "={{ $json.messageType === 'location' }}"
+            },
+            {
+              "output": 9,
+              "expression": "={{ $json.messageType === 'contact' }}"
+            },
+            {
+              "output": 10,
+              "expression": "={{ $json.messageType === 'venue' }}"
+            },
+            {
+              "output": 11,
+              "expression": "={{ $json.messageType === 'poll' }}"
+            },
+            {
+              "output": 12,
+              "expression": "={{ $json.messageType === 'dice' }}"
+            },
+            {
+              "output": 13,
+              "expression": "={{ $json.messageType === 'game' }}"
+            },
+            {
+              "output": 14,
+              "expression": "={{ $json.messageType === 'video_note' }}"
+            }
+          ],
+          "fallbackOutput": 15
+        }
+      },
+      "id": "3a6b7c8d-1e2f-4a5b-9c0d-3e4f5a6b7c8d",
+      "name": "Message Type Router",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "Mensaje de texto recibido: {{ $json.message.text }}",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chatId",
+              "value": "{{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4b7c8d9e-2f3a-5b6c-0d1e-4f5a6b7c8d9e",
+      "name": "Text Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 120]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "Imagen recibida 📸",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chatId",
+              "value": "{{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5c8d9e0f-3a4b-6c7d-1e2f-5a6b7c8d9e0f",
+      "name": "Photo Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 180]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "Video recibido 🎥",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chatId",
+              "value": "{{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6d9e0f1a-4b5c-7d8e-2f3a-6b7c8d9e0f1a",
+      "name": "Video Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 240]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "Mensaje de voz recibido 🎤",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chatId",
+              "value": "{{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7e0f1a2b-5c6d-8e9f-3a4b-7c8d9e0f1a2b",
+      "name": "Voice Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "Audio recibido 🎵",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chatId",
+              "value": "{{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8f1a2b3c-6d7e-9f0a-4b5c-8d9e0f1a2b3c",
+      "name": "Audio Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 360]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "Documento recibido 📄",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chatId",
+              "value": "{{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9a2b3c4d-7e8f-0a1b-5c6d-9e0f1a2b3c4d",
+      "name": "Document Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 420]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "{{ $json.messageType }} recibido ✨",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chatId",
+              "value": "{{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0b3c4d5e-8f9a-1b2c-6d7e-0f1a2b3c4d5e",
+      "name": "Other Types Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 540]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "response",
+              "name": "response",
+              "value": "Tipo de mensaje no soportado 🤖",
+              "type": "string"
+            },
+            {
+              "id": "chatId",
+              "name": "chatId",
+              "value": "{{ $json.message.chat.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1c4d5e6f-9a0b-2c3d-7e8f-1a2b3c4d5e6f",
+      "name": "Unknown Handler",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [900, 600]
+    },
+    {
+      "parameters": {
+        "authentication": "accessToken",
+        "accessToken": "={{$vars.TELEGRAM_BOT_TOKEN}}",
+        "chatId": "={{ $json.chatId }}",
+        "text": "={{ $json.response }}"
+      },
+      "id": "2d5e6f7a-0b1c-3d4e-8f9a-2b3c4d5e6f7a",
+      "name": "Send Telegram Response",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1120, 360]
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message Type Detector",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Type Detector": {
+      "main": [
+        [
+          {
+            "node": "Message Type Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Type Router": {
+      "main": [
+        [
+          {
+            "node": "Text Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Photo Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Video Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Voice Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Audio Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Document Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Other Types Handler",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Unknown Handler",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Text Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Photo Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Video Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Voice Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audio Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Other Types Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unknown Handler": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-06-13T21:55:07.000Z",
+  "versionId": "1"
+}
+
