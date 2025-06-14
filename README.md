@@ -50,6 +50,8 @@ todo que se consigue con {{ JSON.stringify($json, null, 2) }}
 Se convertiría en un agente especialista en TELEGRAM pero usamos 
 realmente no es agente, es una cadena, no lo veo muy oportuno pero ya hace funciones no deterministicas no programadas 
 
+tenemos un articulo que habla de las ventajas del llm chain, parece que hay varios niveles de complejidad 
+
 ### multimensaje
 A veces llegan varios tipos de mensaje a la vez 
 por ejemplo si adjunto un fichero tambien puedo adjuntar un comentarios de texto
