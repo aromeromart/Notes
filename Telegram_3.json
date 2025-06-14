@@ -69,12 +69,83 @@
       "parameters": {
         "mode": "runOnceForEachItem",
         "language": "python",
-        "pythonCode": "# Message Type Detector - Python para n8n (Formato Corregido)\n# IMPORTANTE: Configurar el nodo en \"Run Once for All Items\"\n# Lenguaje: Python\n\nimport json\nfrom datetime import datetime\n\n# Obtener todos los items\nitems = _input.all()\n\nprint(f\"Recibidos {len(items)} items para procesar\")\n\n# Procesar cada item\nprocessed_items = []\n\nfor item in items:\n    # Obtener el mensaje del JSON\n    message = item['json'].get('message') or item['json'].get('edited_message')\n    \n    if not message:\n        # Si no hay mensaje, añadir el elemento original\n        print('Item sin mensaje, saltando...')\n        processed_items.append(dict(item['json']))\n        continue\n    \n    print(f\"Procesando mensaje ID: {message.get('message_id')}\")\n    \n    # Detectar TODOS los tipos presentes\n    message_types = []\n    \n    if 'text' in message:\n        message_types.append('text')\n    if 'photo' in message:\n        message_types.append('photo')\n    if 'video' in message:\n        message_types.append('video')\n    if 'voice' in message:\n        message_types.append('voice')\n    if 'audio' in message:\n        message_types.append('audio')\n    if 'document' in message:\n        message_types.append('document')\n    if 'sticker' in message:\n        message_types.append('sticker')\n    if 'animation' in message:\n        message_types.append('animation')\n    if 'location' in message:\n        message_types.append('location')\n    if 'contact' in message:\n        message_types.append('contact')\n    if 'venue' in message:\n        message_types.append('venue')\n    if 'poll' in message:\n        message_types.append('poll')\n    if 'dice' in message:\n        message_types.append('dice')\n    if 'game' in message:\n        message_types.append('game')\n    if 'video_note' in message:\n        message_types.append('video_note')\n    \n    # Determinar tipo principal\n    primary_type = 'unknown'\n    if len(message_types) > 0:\n        primary_type = message_types[0]\n    \n    # Detectar comandos\n    if primary_type == 'text' and 'text' in message and message['text'].startswith('/'):\n        primary_type = 'command'\n    \n    print(f\"Tipo detectado: {primary_type}, todos los tipos: {', '.join(message_types)}\")\n    \n    # Extraer información adicional\n    additional_info = {}\n    \n    if 'text' in message:\n        additional_info['textContent'] = message['text']\n        additional_info['textLength'] = len(message['text'])\n    \n    if primary_type == 'command' and 'text' in message:\n        text_parts = message['text'].split(' ')\n        additional_info['command'] = text_parts[0]\n        additional_info['commandArgs'] = text_parts[1:] if len(text_parts) > 1 else []\n    \n    if 'caption' in message:\n        additional_info['caption'] = message['caption']\n        additional_info['captionLength'] = len(message['caption'])\n    \n    # Información del usuario\n    user_info = {}\n    if 'from' in message:\n        from_user = message['from']\n        user_info['userId'] = from_user.get('id')\n        user_info['firstName'] = from_user.get('first_name', '')\n        user_info['lastName'] = from_user.get('last_name', '')\n        user_info['username'] = from_user.get('username', '')\n        user_info['languageCode'] = from_user.get('language_code', 'en')\n        user_info['isBot'] = from_user.get('is_bot', False)\n    \n    # Información del chat\n    chat_info = {}\n    if 'chat' in message:\n        chat = message['chat']\n        chat_info['chatId'] = chat.get('id')\n        chat_info['chatType'] = chat.get('type')\n        chat_info['chatTitle'] = chat.get('title', '')\n    \n    # Timestamp del mensaje\n    message_info = {\n        'messageId': message.get('message_id'),\n        'date': message.get('date'),\n        'timestamp': datetime.fromtimestamp(message.get('date', 0)).isoformat() + 'Z'\n    }\n    \n    # Crear resultado - COPIAR el JSON original y añadir nuevos campos\n    result = dict(item['json'])\n    \n    # Añadir nuevos campos\n    result.update({\n        'messageType': primary_type,\n        'allMessageTypes': message_types,\n        'hasMultipleTypes': len(message_types) > 1,\n        'isCommand': primary_type == 'command',\n        'additionalInfo': additional_info,\n        'userInfo': user_info,\n        'chatInfo': chat_info,\n        'messageInfo': message_info,\n        'isPrivateChat': chat_info.get('chatType') == 'private',\n        'isGroupChat': chat_info.get('chatType') in ['group', 'supergroup'],\n        'isChannelPost': chat_info.get('chatType') == 'channel',\n        'hasText': 'text' in message_types or 'caption' in message,\n        'hasMedia': any(msg_type in ['photo', 'video', 'audio', 'voice', 'document', 'sticker', 'animation'] for msg_type in message_types),\n        'debug': {\n            'detectedFields': list(message.keys()),\n            'processingTime': datetime.now().isoformat() + 'Z',\n            'itemIndex': len(processed_items) + 1,\n            'totalItems': len(items)\n        }\n    })\n    \n    processed_items.append(result)\n\nprint(f\"Finalizando: {len(processed_items)} items procesados de {len(items)} recibidos\")\n\n# IMPORTANTE: En Python para n8n, devolver un diccionario con los items procesados\n# Extraer el messageType del primer item para el nivel superior\nfirst_message_type = 'unknown'\nif processed_items and 'messageType' in processed_items[0]:\n    first_message_type = processed_items[0]['messageType']\n\nreturn {\n    'messageType': first_message_type,  # messageType individual del primer mensaje\n    'chat_id' : processed_items[0]['message']['from']['id'],\n    'totalProcessed': len(processed_items),\n    'totalReceived': len(items),\n    'items': processed_items\n}\n\n"
+        "pythonCode": "# SECURITY WHITELIST - Lista blanca de usuarios autorizados\n# IMPORTANTE: Configurar el nodo en \"Run Once for All Items\"\n# Lenguaje: Python\n\nimport json\nfrom datetime import datetime\n\n# ===========================================\n# CONFIGURACIÓN DE SEGURIDAD - LISTA BLANCA\n# ===========================================\n# Agregar aquí los IDs de usuarios autorizados\n# Para obtener tu ID, envía cualquier mensaje y revisa los logs\nAUTHORIZED_USER_IDS = [\n    # Ejemplo: 123456789,  # Usuario Administrador\n    # Ejemplo: 987654321,  # Usuario Permitido\n    # AGREGAR TUS IDs AQUÍ:\n]\n\n# Configuración adicional de seguridad\nALLOW_ADMIN_COMMANDS = True  # Permitir comandos administrativos\nLOG_UNAUTHORIZED_ATTEMPTS = True  # Registrar intentos no autorizados\nNOTIFY_ADMIN_ON_UNAUTHORIZED = True  # Notificar al admin sobre accesos no autorizados\nADMIN_USER_ID = None  # ID del administrador principal (opcional)\n\n# Obtener todos los items\nitems = _input.all()\n\nprint(f\"[SECURITY] Verificando {len(items)} items para autorización\")\n\n# Procesar cada item\nauthorized_items = []\nunauthorized_attempts = []\n\nfor item in items:\n    # Obtener el mensaje del JSON\n    message = item['json'].get('message') or item['json'].get('edited_message')\n    \n    if not message:\n        print('[SECURITY] Item sin mensaje, saltando verificación...')\n        continue\n    \n    # Extraer información del usuario\n    user_id = None\n    user_info = {}\n    \n    if 'from' in message:\n        from_user = message['from']\n        user_id = from_user.get('id')\n        user_info = {\n            'userId': user_id,\n            'firstName': from_user.get('first_name', ''),\n            'lastName': from_user.get('last_name', ''),\n            'username': from_user.get('username', ''),\n            'languageCode': from_user.get('language_code', 'en'),\n            'isBot': from_user.get('is_bot', False)\n        }\n    \n    # Verificar autorización\n    is_authorized = False\n    security_level = 'DENIED'\n    \n    if user_id:\n        if user_id in AUTHORIZED_USER_IDS:\n            is_authorized = True\n            security_level = 'AUTHORIZED'\n            print(f'[SECURITY] ✅ Usuario autorizado: {user_id} ({user_info.get(\"firstName\", \"Unknown\")})')\n        else:\n            print(f'[SECURITY] ❌ Usuario NO autorizado: {user_id} ({user_info.get(\"firstName\", \"Unknown\")})')\n            \n            # Registrar intento no autorizado\n            unauthorized_attempt = {\n                'timestamp': datetime.now().isoformat() + 'Z',\n                'userId': user_id,\n                'userInfo': user_info,\n                'messageId': message.get('message_id'),\n                'messageText': message.get('text', '')[:100],  # Primeros 100 caracteres\n                'chatId': message.get('chat', {}).get('id'),\n                'chatType': message.get('chat', {}).get('type')\n            }\n            unauthorized_attempts.append(unauthorized_attempt)\n    else:\n        print('[SECURITY] ⚠️ No se pudo obtener el ID del usuario')\n    \n    # Si está autorizado, procesar el mensaje\n    if is_authorized:\n        # Crear una copia del item original y agregar información de seguridad\n        authorized_item = dict(item['json'])\n        authorized_item.update({\n            'securityCheck': {\n                'isAuthorized': True,\n                'securityLevel': security_level,\n                'userId': user_id,\n                'checkTimestamp': datetime.now().isoformat() + 'Z'\n            }\n        })\n        authorized_items.append(authorized_item)\n\n# Estadísticas de seguridad\nsecurity_stats = {\n    'totalProcessed': len(items),\n    'authorizedCount': len(authorized_items),\n    'unauthorizedCount': len(unauthorized_attempts),\n    'securityLevel': 'HIGH' if len(AUTHORIZED_USER_IDS) > 0 else 'LOW',\n    'timestamp': datetime.now().isoformat() + 'Z'\n}\n\nprint(f'[SECURITY] Estadísticas finales:')\nprint(f'[SECURITY] - Items procesados: {security_stats[\"totalProcessed\"]}')\nprint(f'[SECURITY] - Autorizados: {security_stats[\"authorizedCount\"]}')\nprint(f'[SECURITY] - No autorizados: {security_stats[\"unauthorizedCount\"]}')\nprint(f'[SECURITY] - Nivel de seguridad: {security_stats[\"securityLevel\"]}')\n\n# Si no hay usuarios autorizados, devolver error\nif len(authorized_items) == 0:\n    if len(AUTHORIZED_USER_IDS) == 0:\n        print('[SECURITY] ⚠️ ADVERTENCIA: Lista blanca vacía - Configurar AUTHORIZED_USER_IDS')\n        return {\n            'error': 'SECURITY_NOT_CONFIGURED',\n            'message': 'Lista blanca de usuarios no configurada',\n            'securityStats': security_stats,\n            'configurationRequired': True\n        }\n    else:\n        print('[SECURITY] 🚫 Acceso denegado - Usuario no autorizado')\n        return {\n            'error': 'ACCESS_DENIED',\n            'message': 'Usuario no autorizado',\n            'securityStats': security_stats,\n            'unauthorizedAttempts': unauthorized_attempts\n        }\n\n# Devolver solo los items autorizados\nprint(f'[SECURITY] ✅ Procesamiento completado - {len(authorized_items)} items autorizados')\n\nreturn {\n    'authorized': True,\n    'securityStats': security_stats,\n    'items': authorized_items,\n    'unauthorizedAttempts': unauthorized_attempts if LOG_UNAUTHORIZED_ATTEMPTS else []\n}\n"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1460,
+        -1600,
+        -220
+      ],
+      "id": "security-whitelist-001",
+      "name": "Security Whitelist"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "security-condition-1",
+              "leftValue": "={{ $json.authorized }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equal"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        -1400,
+        -220
+      ],
+      "id": "security-gateway-001",
+      "name": "Security Gateway"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.unauthorizedAttempts[0].chatId }}",
+        "text": "🚫 *Acceso Denegado*\n\n❌ No tienes autorización para usar este bot.\n\n🔒 *Información de seguridad:*\n👤 Usuario: {{ $json.unauthorizedAttempts[0].userInfo.firstName }} {{ $json.unauthorizedAttempts[0].userInfo.lastName }}\n🆔 ID: `{{ $json.unauthorizedAttempts[0].userId }}`\n🕐 Hora: {{ $now.format('DD/MM/YYYY HH:mm:ss') }}\n\n📧 Si necesitas acceso, contacta al administrador.",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -1200,
+        -400
+      ],
+      "id": "security-notification-001",
+      "name": "Security Notification",
+      "webhookId": "security-webhook-001",
+      "credentials": {
+        "telegramApi": {
+          "id": "qewxMnkEW21ue5fe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "# Message Type Detector - Python para n8n (Formato Corregido)\n# IMPORTANTE: Configurar el nodo en \"Run Once for All Items\"\n# Lenguaje: Python\n\nimport json\nfrom datetime import datetime\n\n# Obtener todos los items autorizados del nodo anterior\nitems = _input.all()\n\nprint(f\"Recibidos {len(items)} items autorizados para procesar\")\n\n# Procesar cada item\nprocessed_items = []\n\nfor item in items:\n    # Los items ya vienen pre-autorizados del Security Gateway\n    # Obtener el mensaje del JSON\n    message = item['json'].get('message') or item['json'].get('edited_message')\n    \n    if not message:\n        # Si no hay mensaje, añadir el elemento original\n        print('Item sin mensaje, saltando...')\n        processed_items.append(dict(item['json']))\n        continue\n    \n    print(f\"Procesando mensaje autorizado ID: {message.get('message_id')}\")\n    \n    # Detectar TODOS los tipos presentes\n    message_types = []\n    \n    if 'text' in message:\n        message_types.append('text')\n    if 'photo' in message:\n        message_types.append('photo')\n    if 'video' in message:\n        message_types.append('video')\n    if 'voice' in message:\n        message_types.append('voice')\n    if 'audio' in message:\n        message_types.append('audio')\n    if 'document' in message:\n        message_types.append('document')\n    if 'sticker' in message:\n        message_types.append('sticker')\n    if 'animation' in message:\n        message_types.append('animation')\n    if 'location' in message:\n        message_types.append('location')\n    if 'contact' in message:\n        message_types.append('contact')\n    if 'venue' in message:\n        message_types.append('venue')\n    if 'poll' in message:\n        message_types.append('poll')\n    if 'dice' in message:\n        message_types.append('dice')\n    if 'game' in message:\n        message_types.append('game')\n    if 'video_note' in message:\n        message_types.append('video_note')\n    \n    # Determinar tipo principal\n    primary_type = 'unknown'\n    if len(message_types) > 0:\n        primary_type = message_types[0]\n    \n    # Detectar comandos\n    if primary_type == 'text' and 'text' in message and message['text'].startswith('/'):\n        primary_type = 'command'\n    \n    print(f\"Tipo detectado: {primary_type}, todos los tipos: {', '.join(message_types)}\")\n    \n    # Extraer información adicional\n    additional_info = {}\n    \n    if 'text' in message:\n        additional_info['textContent'] = message['text']\n        additional_info['textLength'] = len(message['text'])\n    \n    if primary_type == 'command' and 'text' in message:\n        text_parts = message['text'].split(' ')\n        additional_info['command'] = text_parts[0]\n        additional_info['commandArgs'] = text_parts[1:] if len(text_parts) > 1 else []\n    \n    if 'caption' in message:\n        additional_info['caption'] = message['caption']\n        additional_info['captionLength'] = len(message['caption'])\n    \n    # Información del usuario (ya verificada por Security)\n    user_info = {}\n    if 'from' in message:\n        from_user = message['from']\n        user_info['userId'] = from_user.get('id')\n        user_info['firstName'] = from_user.get('first_name', '')\n        user_info['lastName'] = from_user.get('last_name', '')\n        user_info['username'] = from_user.get('username', '')\n        user_info['languageCode'] = from_user.get('language_code', 'en')\n        user_info['isBot'] = from_user.get('is_bot', False)\n        user_info['isAuthorized'] = True  # Marcamos como autorizado\n    \n    # Información del chat\n    chat_info = {}\n    if 'chat' in message:\n        chat = message['chat']\n        chat_info['chatId'] = chat.get('id')\n        chat_info['chatType'] = chat.get('type')\n        chat_info['chatTitle'] = chat.get('title', '')\n    \n    # Timestamp del mensaje\n    message_info = {\n        'messageId': message.get('message_id'),\n        'date': message.get('date'),\n        'timestamp': datetime.fromtimestamp(message.get('date', 0)).isoformat() + 'Z'\n    }\n    \n    # Crear resultado - COPIAR el JSON original y añadir nuevos campos\n    result = dict(item['json'])\n    \n    # Añadir nuevos campos\n    result.update({\n        'messageType': primary_type,\n        'allMessageTypes': message_types,\n        'hasMultipleTypes': len(message_types) > 1,\n        'isCommand': primary_type == 'command',\n        'additionalInfo': additional_info,\n        'userInfo': user_info,\n        'chatInfo': chat_info,\n        'messageInfo': message_info,\n        'isPrivateChat': chat_info.get('chatType') == 'private',\n        'isGroupChat': chat_info.get('chatType') in ['group', 'supergroup'],\n        'isChannelPost': chat_info.get('chatType') == 'channel',\n        'hasText': 'text' in message_types or 'caption' in message,\n        'hasMedia': any(msg_type in ['photo', 'video', 'audio', 'voice', 'document', 'sticker', 'animation'] for msg_type in message_types),\n        'debug': {\n            'detectedFields': list(message.keys()),\n            'processingTime': datetime.now().isoformat() + 'Z',\n            'itemIndex': len(processed_items) + 1,\n            'totalItems': len(items),\n            'securityPassed': True\n        }\n    })\n    \n    processed_items.append(result)\n\nprint(f\"Finalizando: {len(processed_items)} items procesados de {len(items)} recibidos (todos autorizados)\")\n\n# IMPORTANTE: En Python para n8n, devolver un diccionario con los items procesados\n# Extraer el messageType del primer item para el nivel superior\nfirst_message_type = 'unknown'\nif processed_items and 'messageType' in processed_items[0]:\n    first_message_type = processed_items[0]['messageType']\n\nreturn {\n    'messageType': first_message_type,  # messageType individual del primer mensaje\n    'chat_id' : processed_items[0]['message']['from']['id'],\n    'totalProcessed': len(processed_items),\n    'totalReceived': len(items),\n    'securityLevel': 'AUTHORIZED',\n    'items': processed_items\n}\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1260,
         -220
       ],
       "id": "2ec0e3f6-267c-4da8-9f9f-9115b6526084",
@@ -198,7 +269,36 @@
       "main": [
         [
           {
+            "node": "Security Whitelist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Security Whitelist": {
+      "main": [
+        [
+          {
+            "node": "Security Gateway",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Security Gateway": {
+      "main": [
+        [
+          {
             "node": "MessageType py",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Security Notification",
             "type": "main",
             "index": 0
           }

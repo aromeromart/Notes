@@ -81,3 +81,14 @@ o que puedan cambiar su propio código
 y a esto apunta n8n 
 
 
+# nodo de seguridad 
+y claramente determinístico 
+
+## pero el problema es el SET, me pierdo con los sets 
+un set de todo desde el prinipio 
+aquí me hago un lio, preguntar 
+por sobre todo como me refiero a las variables en python 
+eto es lo dificultoso
+
+
+
