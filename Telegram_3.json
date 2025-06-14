@@ -1,0 +1,280 @@
+{
+  "name": "Telegram 3",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1700,
+        -220
+      ],
+      "id": "b1e20c54-08ef-44c8-bcdf-b117fc33a32b",
+      "name": "Telegram Trigger",
+      "webhookId": "7903da52-2414-4f89-8808-9e0f159ba2c6",
+      "credentials": {
+        "telegramApi": {
+          "id": "qewxMnkEW21ue5fe",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Siempre vas a recibir informacion sobre mensajes procedents de telegram\nde los que tomas su chat_id {{ $json.chat_id }}\n\nESta informacion ventra en formato json \n\ndame una interpretacion de lo que recibes \n\n tipo de mensjae {{ $json.messageType }}\n\ntodo = {{ JSON.stringify($json, null, 2) }}\n\nquiero que el resultado me lo formatees para que pueda enviarlo por telegram, recuerda que hay una limitacion de numero de \ncaracteres\n\ntu primera tarea es incluirme en la salida el mensaje de telegram y llamalo mensaje\nEn la misma salida dame una opinión de todo el mensaje que es harecibdo, llámalo análisis\n\nEn ambos casos trata de que sea vistoso estos mensajes que vamos a enviar por Telegram\n\n\n\n\n\n\n",
+        "hasOutputParser": true,
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -1180,
+        -240
+      ],
+      "id": "5f40c134-4b2e-42c7-ab20-7597643413c6",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4.1-mini-2025-04-14",
+          "mode": "list",
+          "cachedResultName": "gpt-4.1-mini-2025-04-14"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -1180,
+        -80
+      ],
+      "id": "7d6e2fc4-f9b0-4d8b-9175-c53579115602",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "i2fZsaTUu247WaBj",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "language": "python",
+        "pythonCode": "# Message Type Detector - Python para n8n (Formato Corregido)\n# IMPORTANTE: Configurar el nodo en \"Run Once for All Items\"\n# Lenguaje: Python\n\nimport json\nfrom datetime import datetime\n\n# Obtener todos los items\nitems = _input.all()\n\nprint(f\"Recibidos {len(items)} items para procesar\")\n\n# Procesar cada item\nprocessed_items = []\n\nfor item in items:\n    # Obtener el mensaje del JSON\n    message = item['json'].get('message') or item['json'].get('edited_message')\n    \n    if not message:\n        # Si no hay mensaje, añadir el elemento original\n        print('Item sin mensaje, saltando...')\n        processed_items.append(dict(item['json']))\n        continue\n    \n    print(f\"Procesando mensaje ID: {message.get('message_id')}\")\n    \n    # Detectar TODOS los tipos presentes\n    message_types = []\n    \n    if 'text' in message:\n        message_types.append('text')\n    if 'photo' in message:\n        message_types.append('photo')\n    if 'video' in message:\n        message_types.append('video')\n    if 'voice' in message:\n        message_types.append('voice')\n    if 'audio' in message:\n        message_types.append('audio')\n    if 'document' in message:\n        message_types.append('document')\n    if 'sticker' in message:\n        message_types.append('sticker')\n    if 'animation' in message:\n        message_types.append('animation')\n    if 'location' in message:\n        message_types.append('location')\n    if 'contact' in message:\n        message_types.append('contact')\n    if 'venue' in message:\n        message_types.append('venue')\n    if 'poll' in message:\n        message_types.append('poll')\n    if 'dice' in message:\n        message_types.append('dice')\n    if 'game' in message:\n        message_types.append('game')\n    if 'video_note' in message:\n        message_types.append('video_note')\n    \n    # Determinar tipo principal\n    primary_type = 'unknown'\n    if len(message_types) > 0:\n        primary_type = message_types[0]\n    \n    # Detectar comandos\n    if primary_type == 'text' and 'text' in message and message['text'].startswith('/'):\n        primary_type = 'command'\n    \n    print(f\"Tipo detectado: {primary_type}, todos los tipos: {', '.join(message_types)}\")\n    \n    # Extraer información adicional\n    additional_info = {}\n    \n    if 'text' in message:\n        additional_info['textContent'] = message['text']\n        additional_info['textLength'] = len(message['text'])\n    \n    if primary_type == 'command' and 'text' in message:\n        text_parts = message['text'].split(' ')\n        additional_info['command'] = text_parts[0]\n        additional_info['commandArgs'] = text_parts[1:] if len(text_parts) > 1 else []\n    \n    if 'caption' in message:\n        additional_info['caption'] = message['caption']\n        additional_info['captionLength'] = len(message['caption'])\n    \n    # Información del usuario\n    user_info = {}\n    if 'from' in message:\n        from_user = message['from']\n        user_info['userId'] = from_user.get('id')\n        user_info['firstName'] = from_user.get('first_name', '')\n        user_info['lastName'] = from_user.get('last_name', '')\n        user_info['username'] = from_user.get('username', '')\n        user_info['languageCode'] = from_user.get('language_code', 'en')\n        user_info['isBot'] = from_user.get('is_bot', False)\n    \n    # Información del chat\n    chat_info = {}\n    if 'chat' in message:\n        chat = message['chat']\n        chat_info['chatId'] = chat.get('id')\n        chat_info['chatType'] = chat.get('type')\n        chat_info['chatTitle'] = chat.get('title', '')\n    \n    # Timestamp del mensaje\n    message_info = {\n        'messageId': message.get('message_id'),\n        'date': message.get('date'),\n        'timestamp': datetime.fromtimestamp(message.get('date', 0)).isoformat() + 'Z'\n    }\n    \n    # Crear resultado - COPIAR el JSON original y añadir nuevos campos\n    result = dict(item['json'])\n    \n    # Añadir nuevos campos\n    result.update({\n        'messageType': primary_type,\n        'allMessageTypes': message_types,\n        'hasMultipleTypes': len(message_types) > 1,\n        'isCommand': primary_type == 'command',\n        'additionalInfo': additional_info,\n        'userInfo': user_info,\n        'chatInfo': chat_info,\n        'messageInfo': message_info,\n        'isPrivateChat': chat_info.get('chatType') == 'private',\n        'isGroupChat': chat_info.get('chatType') in ['group', 'supergroup'],\n        'isChannelPost': chat_info.get('chatType') == 'channel',\n        'hasText': 'text' in message_types or 'caption' in message,\n        'hasMedia': any(msg_type in ['photo', 'video', 'audio', 'voice', 'document', 'sticker', 'animation'] for msg_type in message_types),\n        'debug': {\n            'detectedFields': list(message.keys()),\n            'processingTime': datetime.now().isoformat() + 'Z',\n            'itemIndex': len(processed_items) + 1,\n            'totalItems': len(items)\n        }\n    })\n    \n    processed_items.append(result)\n\nprint(f\"Finalizando: {len(processed_items)} items procesados de {len(items)} recibidos\")\n\n# IMPORTANTE: En Python para n8n, devolver un diccionario con los items procesados\n# Extraer el messageType del primer item para el nivel superior\nfirst_message_type = 'unknown'\nif processed_items and 'messageType' in processed_items[0]:\n    first_message_type = processed_items[0]['messageType']\n\nreturn {\n    'messageType': first_message_type,  # messageType individual del primer mensaje\n    'chat_id' : processed_items[0]['message']['from']['id'],\n    'totalProcessed': len(processed_items),\n    'totalReceived': len(items),\n    'items': processed_items\n}\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1460,
+        -220
+      ],
+      "id": "2ec0e3f6-267c-4da8-9f9f-9115b6526084",
+      "name": "MessageType py"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f9c6a0fb-81ea-4ff2-a838-4d816d42f915",
+              "name": "messageType",
+              "value": "={{ $json.items[0].message.chat.id }}",
+              "type": "number"
+            },
+            {
+              "id": "bec2e8e2-dc69-4342-8545-5c07c8070633",
+              "name": "=messageType",
+              "value": "={{ $json.messageType }}",
+              "type": "string"
+            },
+            {
+              "id": "b506044b-c0cf-4c53-b122-9cf89cf81019",
+              "name": "username",
+              "value": "={{ $json.items[0].userInfo.firstName }} {{ $json.items[0].userInfo.lastName }}",
+              "type": "string"
+            },
+            {
+              "id": "caf6aba0-e64b-4c0f-95f7-428fa9eee6d6",
+              "name": "timestamp",
+              "value": "={{ $json.items[0].messageInfo.timestamp }}",
+              "type": "string"
+            },
+            {
+              "id": "14f4c63f-4a69-4393-a394-89ebfc2a12b1",
+              "name": "hasMultipleTypes",
+              "value": "={{ $json.items[0].hasMultipleTypes }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1200,
+        -540
+      ],
+      "id": "0c988979-3c58-45eb-934b-0e0866499c7e",
+      "name": "MessageType",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.chat_id }}",
+        "text": "=*00 Tipo de mensaje*\n\n📝 *Tipo:* `{{ $json.messageType }}`{{ $json.items[0].hasMultipleTypes ? ' _(múltiples tipos)_' : '' }}\n👤 *De:* {{ $json.items[0].userInfo.firstName }} {{ $json.items[0].userInfo.lastName }}\n🕐 *Hora:* {{ $now.format('HH:mm:ss') }}\n📊 *ID:* `{{ $json.items[0].messageInfo.messageId }}`\n\n✅ *Estado:* Procesado correctamente",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -880,
+        -540
+      ],
+      "id": "d8ed8187-11d6-40df-8458-f9c9325dacf8",
+      "name": "Telegram",
+      "webhookId": "ad2fa3e7-f489-490a-8a99-fb058220f552",
+      "credentials": {
+        "telegramApi": {
+          "id": "qewxMnkEW21ue5fe",
+          "name": "Telegram account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"textoTelegram\": \"mensaje recibido\",\n  \"analisis\" : \"Este mensaje es un saludo cordial y sencillo, transmitido en español. Proviene de un chat privado con un usuario real (no bot), lo que indica una comunicación directa y personal. No contiene comandos ni medios adicionales, lo que facilita su procesamiento y respuesta. La longitud del texto es corta (11 caracteres), perfecta para iniciar una conversación amigable y clara.\"\n  \n\t\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -1020,
+        -80
+      ],
+      "id": "24d4280b-c9d8-4197-88b6-52c82fd3aac9",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('MessageType py').item.json.chat_id }}",
+        "text": "={{ $json.output.textoTelegram }}\n\n{{ $json.output.analisis }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -620,
+        -240
+      ],
+      "id": "69d952e0-58d5-4ccd-9d65-e6e423c2e3fb",
+      "name": "Telegram1",
+      "webhookId": "ad2fa3e7-f489-490a-8a99-fb058220f552",
+      "credentials": {
+        "telegramApi": {
+          "id": "qewxMnkEW21ue5fe",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "MessageType py",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Telegram1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MessageType py": {
+      "main": [
+        [
+          {
+            "node": "MessageType",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MessageType": {
+      "main": [
+        [
+          {
+            "node": "Telegram",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "9ca37975-7ea7-4dbd-b0cf-7debf8a340d7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "b76dedcb6a5e728df4b45fad7489449d28ba078b03b3bff4f5fc64f379cb2ca7"
+  },
+  "id": "2gEJvTiHVfbdsaRc",
+  "tags": []
+}
