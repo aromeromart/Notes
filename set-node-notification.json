@@ -1,0 +1,48 @@
+{
+  "name": "Message Received Notification",
+  "type": "n8n-nodes-base.set",
+  "parameters": {
+    "assignments": {
+      "assignments": [
+        {
+          "id": "chatId",
+          "name": "chatId",
+          "value": "={{ $json.items[0].chatInfo.chatId }}",
+          "type": "number"
+        },
+        {
+          "id": "messageType",
+          "name": "messageType", 
+          "value": "={{ $json.messageType }}",
+          "type": "string"
+        },
+        {
+          "id": "userName",
+          "name": "userName",
+          "value": "={{ $json.items[0].userInfo.firstName }} {{ $json.items[0].userInfo.lastName }}",
+          "type": "string"
+        },
+        {
+          "id": "timestamp",
+          "name": "timestamp",
+          "value": "={{ $json.items[0].messageInfo.timestamp }}",
+          "type": "string"
+        },
+        {
+          "id": "hasMultipleTypes",
+          "name": "hasMultipleTypes",
+          "value": "={{ $json.items[0].hasMultipleTypes }}",
+          "type": "boolean"
+        },
+        {
+          "id": "response",
+          "name": "response",
+          "value": "🤖 **Mensaje Recibido y Procesado**\n\n📝 **Tipo:** {{ $json.messageType }}{{ $json.items[0].hasMultipleTypes ? ' (múltiples tipos detectados)' : '' }}\n👤 **De:** {{ $json.items[0].userInfo.firstName }} {{ $json.items[0].userInfo.lastName }}\n🕐 **Hora:** {{ $now.format('HH:mm:ss') }}\n📊 **ID Mensaje:** {{ $json.items[0].messageInfo.messageId }}\n\n{{ $json.messageType === 'text' ? '💬 Texto: \"' + $json.items[0].additionalInfo.textContent + '\"' : $json.messageType === 'photo' ? '📸 Imagen recibida' : $json.messageType === 'video' ? '🎥 Video recibido' : $json.messageType === 'voice' ? '🎤 Mensaje de voz' : $json.messageType === 'audio' ? '🎵 Audio recibido' : $json.messageType === 'document' ? '📄 Documento: ' + ($json.items[0].message.document.file_name || 'Sin nombre') : $json.messageType === 'sticker' ? '😊 Sticker enviado' : $json.messageType === 'location' ? '📍 Ubicación compartida' : $json.messageType === 'contact' ? '👥 Contacto compartido' : $json.messageType === 'poll' ? '📊 Encuesta: \"' + $json.items[0].message.poll.question + '\"' : $json.messageType === 'command' ? '⚙️ Comando: ' + $json.items[0].additionalInfo.command : '✨ Contenido de tipo: ' + $json.messageType }}\n\n✅ **Estado:** Procesado correctamente",
+          "type": "string"
+        }
+      ]
+    },
+    "options": {}
+  }
+}
+

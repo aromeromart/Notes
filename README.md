@@ -42,5 +42,17 @@ ha de guardar lo ue le entra y lo que el va respondiendo
   Voy a construir en n8n un agente que reciba una mensaje de telegram y lo interprete, un agente especializado en telegram
 que me recomiendas 
 
+A veces llegan varios tipos de mensaje a la vez 
+por ejemplo si adjunto un fichero tambien puedo adjuntar un comentarios de texto
+
+EL PROBLEMA DE CUANDO VIENEN VARIOS ITEMS O PAREJAS DE MENSAJES A LA VEZ 
+lo estoy probando este swith en js y python 
+
+interesante las polls, en este caso recibirlas 
+
+usando wrap para aplicar inteligencia artificial y para construir n8n, aquí doy un salto en la academia 
+voy a empezar a trabajar para la academia 
 
 
+
+y que pasa con el mcp server para telegram, aunque es más rápido y conveniente convertirlo en surco, alguna vez lo hará el mismo AUTOAPRENDIZAJE, como puedo implementarlo yo, como hacer pruebas de arquitectura
