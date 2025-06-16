@@ -26,6 +26,12 @@ Tu perfil ahora incluye estas funciones disponibles:
 •  notes - Cambiar al directorio de notas
 •  np - Abrir Notepad++ (alias para Open-NotepadPlusPlus)
 •  s y search - Buscar notas en archivos .md (alias para Search-Notes)
+•  X para abrir el fichero de pendientes 
+•  XX para buscar las tareas pendientes 
+•  xxx para mover los pendientes
+
+
+
 
 He creado un backup de tu perfil original en $PROFILE.backup por si necesitas recuperar algo.
 
