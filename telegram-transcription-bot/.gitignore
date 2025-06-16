@@ -1,0 +1,51 @@
+# Archivos de configuración con credenciales
+.env
+.env.local
+.env.production
+
+# Cache de Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribuciones de Python
+*.egg-info/
+dist/
+build/
+
+# Archivos temporales
+*.tmp
+*.temp
+*.log
+
+# Archivos de audio temporales
+*.ogg
+*.mp3
+*.wav
+*.m4a
+*.webm
+
+# Directorios de entornos virtuales
+venv/
+env/
+.venv/
+.env/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Archivos de respaldo
+*.bak
+*.backup
+

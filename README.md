@@ -90,5 +90,14 @@ aquí me hago un lio, preguntar
 por sobre todo como me refiero a las variables en python 
 eto es lo dificultoso
 
+# EL GRAN PROBLEMA DE LA ARQUITECTURA , del front-end , un dashboard 
+Si no presentamos un buen front-end la cosa no funciona 
+y hay de distintos tipos, web y para movil, son los dos front-end o interfaces principales,
+un front-end que sea un dashboard, que incluso fuera dinámico, cambiado por el usuario, le haríamos actualizaciones 
+
+
+# TELEGRAM ERRORES Y TELGRAM LOG 
+Desde luego tengo los errores pero es fundamental el log (
+XX IR A VER LAS CLASES DE APOYO A VER QUE HAY AHÍ, Y SI ESTÁ LA NUEVA)
 
 
