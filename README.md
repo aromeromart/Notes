@@ -1,4 +1,4 @@
-# Notes
+﻿# Notes
 
 ## Descripción
 fichero que explica como voy desarrollando el proyecto Notes
@@ -19,10 +19,16 @@ git push -u origin main
 
 ## Comandos Útiles
 
-- `g` - para abrir el repositorio Notes
-- `readme` - para abrir el readme con el NOTEPAD
-- `notes` - para ir al directorio notes
-- np para abrir el notepad ++
+
+Tu perfil ahora incluye estas funciones disponibles:
+•  g - Abrir repositorio git en el navegador
+•  readme - Abrir README.md en Notepad++
+•  notes - Cambiar al directorio de notas
+•  np - Abrir Notepad++ (alias para Open-NotepadPlusPlus)
+•  s y search - Buscar notas en archivos .md (alias para Search-Notes)
+
+He creado un backup de tu perfil original en $PROFILE.backup por si necesitas recuperar algo.
+
 
 ## Objetivo
 
@@ -63,7 +69,7 @@ usando wrap para aplicar inteligencia artificial y para construir n8n, aquí doy
 voy a empezar a trabajar para la academia 
 
 quizá no necesite un MPC Server para Telegram, y me tenga que centrar en la verticalidad delo que quiero 
-x quizá debiera definir la verticalidad o hacer algo muy vertical, p.ej. ante audio transcipción 
+x quizá debiera definir la verticalidad o hacer algo muy vertical, p.ej. ante audio transcipción
 
 el colmo es que hiciera peticiones y que las fueramos desarrollando por detrás 
 
@@ -98,6 +104,14 @@ un front-end que sea un dashboard, que incluso fuera dinámico, cambiado por el 
 
 # TELEGRAM ERRORES Y TELGRAM LOG 
 Desde luego tengo los errores pero es fundamental el log (
-XX IR A VER LAS CLASES DE APOYO A VER QUE HAY AHÍ, Y SI ESTÁ LA NUEVA)
+
+
+
+
+
+## bots de Telegram @BotFaher
+puede ser un sitio donde albergar cosas 
+estamos con wrap simulando casi vibe coding 
+
 
 

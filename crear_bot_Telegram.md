@@ -58,3 +58,5 @@ bot.infinity_polling()
 - [Documentación oficial de Telegram Bot API](https://core.telegram.org/bots/api)
 - [Guía oficial de Telegram para bots](https://core.telegram.org/bots)
 
+
+NO TENFO MUY CLARO SI ESROY USANDO bots
