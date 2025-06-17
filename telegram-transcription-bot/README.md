@@ -200,3 +200,6 @@ Si tienes problemas o preguntas:
 
 **¡Disfruta transcribiendo tus audios! 🎉**
 
+XX tenemos un código de chatbot que al final hay que alojarlo,
+xx jon el youtuber habla de hostsginger como el mejor punto de alojamiento
+xx usar metano-ia.org para comunicarme con León 

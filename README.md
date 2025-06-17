@@ -1,4 +1,7 @@
-﻿# Notes
+﻿
+
+
+# Notes
 
 ## Descripción
 fichero que explica como voy desarrollando el proyecto Notes
