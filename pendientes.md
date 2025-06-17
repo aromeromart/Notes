@@ -28,3 +28,6 @@ esto es una nota de prueba
 [2025-06-17 13:57] PROYECTO OPOSICION, una nueva 
 He descubierto que es mas facil usar ps para hacer vibecoding y gestionar mis notas 
 
+sistema de gestion de notas conociendo el entorno preparando un entorno ecosistema muy básico ode elementos muy básicos
+la fascinante idea de documentacion o cadena de documentacion un experimento interesante o simulante
+la gran duda de porqué no puedo hacer que warp escriba por mi no me ha dado explicaciones como capar esto a pesar del riesgo que tiene
